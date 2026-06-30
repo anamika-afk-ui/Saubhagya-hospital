@@ -1,0 +1,6 @@
+{
+  "name": "Saubhagya Hospital",
+  "description": "Official professional, fast, and multilingual website for Saubhagya Hospital Raipur with active appointment scheduling and AI Swasthya Mitra chatbot.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

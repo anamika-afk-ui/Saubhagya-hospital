@@ -79,7 +79,7 @@ export default function Contact({ language }: ContactProps) {
                 </div>
                 <div>
                   <h4 className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t.contactHours}</h4>
-                  <p className="text-sm sm:text-base font-bold text-slate-850 mt-1">
+                  <p className="text-sm sm:text-base font-bold text-slate-800 mt-1">
                     {t.contactHoursVal}
                   </p>
                   <p className="text-xs text-slate-500 mt-0.5">
@@ -95,7 +95,7 @@ export default function Contact({ language }: ContactProps) {
                 </div>
                 <div>
                   <h4 className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t.contactEmail}</h4>
-                  <p className="text-sm sm:text-base font-semibold text-slate-750 mt-1">
+                  <p className="text-sm sm:text-base font-semibold text-slate-700 mt-1">
                     <a href="mailto:info@saubhagyahospital.com" className="hover:text-teal-600 transition">contact@saubhagyahospital.com</a>
                   </p>
                 </div>

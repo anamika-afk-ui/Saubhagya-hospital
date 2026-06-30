@@ -128,7 +128,7 @@ export default function Testimonials({ language }: TestimonialsProps) {
         {/* Submit Review Dialog (Conditional Expansion) */}
         {showForm && (
           <div className="mb-12 p-6 sm:p-8 rounded-2xl border border-blue-100 bg-blue-50/15 max-w-2xl mx-auto transition-all duration-300">
-            <h3 className="text-lg font-bold font-serif text-slate-850 mb-4 flex items-center gap-2">
+            <h3 className="text-lg font-bold font-serif text-slate-800 mb-4 flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-blue-600 animate-pulse" />
               <span>{language === 'en' ? 'Share Your Experience' : 'अपना अनुभव साझा करें'}</span>
             </h3>
@@ -236,7 +236,7 @@ export default function Testimonials({ language }: TestimonialsProps) {
                         <Star key={i} className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
                       ))}
                     </div>
-                    <span className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-0.5 text-[9px] font-bold text-blue-750 uppercase tracking-wider border border-blue-100">
+                    <span className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-0.5 text-[9px] font-bold text-blue-700 uppercase tracking-wider border border-blue-100">
                       {rev.tag}
                     </span>
                   </div>
@@ -244,7 +244,7 @@ export default function Testimonials({ language }: TestimonialsProps) {
                   {/* Body Content */}
                   <div className="relative mb-6">
                     <Quote className="absolute -top-3 -left-3 h-8 w-8 text-blue-100/40 -z-10" />
-                    <p className="text-sm text-slate-655 leading-relaxed italic relative z-10 font-normal font-serif">
+                    <p className="text-sm text-slate-600 leading-relaxed italic relative z-10 font-normal font-serif">
                       "{rev.content[language]}"
                     </p>
                   </div>

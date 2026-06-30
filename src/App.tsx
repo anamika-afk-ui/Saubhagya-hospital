@@ -156,7 +156,7 @@ export default function App() {
                 className={`inline-flex items-center gap-1.5 px-4.5 py-2.5 rounded-xl font-bold text-xs transition cursor-pointer active:scale-95 ${
                   activeView === 'book'
                     ? 'bg-blue-700 text-white border border-blue-800'
-                    : 'bg-blue-650 text-white hover:bg-blue-700 border border-blue-700 shadow-xs'
+                    : 'bg-blue-600 text-white hover:bg-blue-700 border border-blue-700 shadow-xs'
                 }`}
               >
                 <Calendar className="h-4 w-4" />
@@ -191,7 +191,7 @@ export default function App() {
               <button
                 onClick={() => setActiveView('book')}
                 className={`h-9 w-9 flex items-center justify-center rounded-lg cursor-pointer ${
-                  activeView === 'book' ? 'bg-blue-750 text-white border border-blue-850' : 'bg-blue-650 text-white border border-blue-700 shadow-sm'
+                  activeView === 'book' ? 'bg-blue-700 text-white border border-blue-800' : 'bg-blue-600 text-white border border-blue-700 shadow-sm'
                 }`}
                 title={t.navBook}
               >
@@ -216,31 +216,31 @@ export default function App() {
             <div className="space-y-1.5 p-4">
               <button
                 onClick={() => { setActiveView('home'); setMobileMenuOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                className={`block w-full text-left px-4 py-3 rounded-xl font-bold text-sm ${activeView === 'home' ? 'bg-blue-50 text-blue-700' : 'text-slate-650 hover:bg-slate-50'}`}
+                className={`block w-full text-left px-4 py-3 rounded-xl font-bold text-sm ${activeView === 'home' ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50'}`}
               >
                 {t.navHome}
               </button>
               <button
                 onClick={() => scrollToSection('about-section')}
-                className="block w-full text-left px-4 py-3 rounded-xl font-bold text-sm text-slate-650 hover:bg-slate-50"
+                className="block w-full text-left px-4 py-3 rounded-xl font-bold text-sm text-slate-600 hover:bg-slate-50"
               >
                 {t.navAbout}
               </button>
               <button
                 onClick={() => scrollToSection('services-section')}
-                className="block w-full text-left px-4 py-3 rounded-xl font-bold text-sm text-slate-650 hover:bg-slate-50"
+                className="block w-full text-left px-4 py-3 rounded-xl font-bold text-sm text-slate-600 hover:bg-slate-50"
               >
                 {t.navServices}
               </button>
               <button
                 onClick={() => scrollToSection('reviews-section')}
-                className="block w-full text-left px-4 py-3 rounded-xl font-bold text-sm text-slate-650 hover:bg-slate-50"
+                className="block w-full text-left px-4 py-3 rounded-xl font-bold text-sm text-slate-600 hover:bg-slate-50"
               >
                 {t.navReviews}
               </button>
               <button
                 onClick={() => scrollToSection('contact-section')}
-                className="block w-full text-left px-4 py-3 rounded-xl font-bold text-sm text-slate-650 hover:bg-slate-50"
+                className="block w-full text-left px-4 py-3 rounded-xl font-bold text-sm text-slate-600 hover:bg-slate-50"
               >
                 {t.navContact}
               </button>
@@ -256,7 +256,7 @@ export default function App() {
                 </button>
                 <button
                   onClick={() => { setActiveView('book'); setMobileMenuOpen(false); }}
-                  className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-blue-650 text-white px-4 py-3 font-bold text-xs"
+                  className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-blue-600 text-white px-4 py-3 font-bold text-xs"
                 >
                   <Calendar className="h-4 w-4" />
                   <span>{t.navBook}</span>

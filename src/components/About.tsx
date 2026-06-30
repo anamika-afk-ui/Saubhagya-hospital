@@ -81,7 +81,7 @@ export default function About({ language }: AboutProps) {
                   language === 'en' ? "Advanced Diagnostic Lab" : "उन्नत पैथोलॉजी लैब",
                   language === 'en' ? "24/7 Resident Doctors" : "24 घंटे रेजिडेंट डॉक्टर"
                 ].map((item, index) => (
-                  <div key={index} className="flex items-center gap-2 text-sm text-slate-650 font-medium">
+                  <div key={index} className="flex items-center gap-2 text-sm text-slate-600 font-medium">
                     <CheckCircle className="h-4 w-4 text-blue-600 shrink-0" />
                     <span>{item}</span>
                   </div>
@@ -102,7 +102,7 @@ export default function About({ language }: AboutProps) {
                   <div className={`inline-flex h-11 w-11 items-center justify-center rounded-xl border mb-4 ${feat.color}`}>
                     <Icon className="h-5 w-5" />
                   </div>
-                  <h4 className="text-base font-bold text-slate-850 mb-2">
+                  <h4 className="text-base font-bold text-slate-800 mb-2">
                     {feat.title}
                   </h4>
                   <p className="text-xs text-slate-500 leading-relaxed">

@@ -13,6 +13,7 @@ import {
   Sparkles,
   Heart
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Language, translations } from './types';
 import Hero from './components/Hero';
 import About from './components/About';
@@ -268,28 +269,52 @@ export default function App() {
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1">
-        {activeView === 'home' && (
-          <>
-            <Hero language={language} onNavigate={setActiveView} />
-            <About language={language} />
-            <Services language={language} onBookDepartment={handleBookFromSpecialty} />
-            <Testimonials language={language} />
-            <Contact language={language} />
-          </>
-        )}
+      <main className="flex-1 overflow-hidden">
+        <AnimatePresence mode="wait">
+          {activeView === 'home' && (
+            <motion.div
+              key="home"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              transition={{ duration: 0.35, ease: "easeInOut" }}
+            >
+              <Hero language={language} onNavigate={setActiveView} />
+              <About language={language} />
+              <Services language={language} onBookDepartment={handleBookFromSpecialty} />
+              <Testimonials language={language} />
+              <Contact language={language} />
+            </motion.div>
+          )}
 
-        {activeView === 'book' && (
-          <Appointments 
-            language={language} 
-            selectedDeptId={selectedDeptId}
-            onClearSelectedDept={() => setSelectedDeptId(undefined)}
-          />
-        )}
+          {activeView === 'book' && (
+            <motion.div
+              key="book"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              transition={{ duration: 0.35, ease: "easeInOut" }}
+            >
+              <Appointments 
+                language={language} 
+                selectedDeptId={selectedDeptId}
+                onClearSelectedDept={() => setSelectedDeptId(undefined)}
+              />
+            </motion.div>
+          )}
 
-        {activeView === 'chat' && (
-          <AiAssistant language={language} />
-        )}
+          {activeView === 'chat' && (
+            <motion.div
+              key="chat"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              transition={{ duration: 0.35, ease: "easeInOut" }}
+            >
+              <AiAssistant language={language} />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </main>
 
       {/* Hospital Footer */}

@@ -13,6 +13,7 @@ import {
   Sparkles,
   Award
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Language, translations, DEPARTMENTS, Appointment } from '../types';
 
 interface AppointmentsProps {
@@ -202,335 +203,401 @@ Thank you for trusting Saubhagya Hospital!
   };
 
   return (
-    <section id="appointments-section" className="py-16 sm:py-24 bg-white border-t border-slate-100">
+    <section id="appointments-section" className="py-16 sm:py-24 bg-white border-t border-slate-100 overflow-hidden">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <span className="text-xs font-bold uppercase tracking-widest text-teal-600 bg-teal-50 px-3 py-1 rounded-full border border-teal-100">
+          <motion.span 
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            className="text-xs font-bold uppercase tracking-widest text-teal-600 bg-teal-50 px-3 py-1 rounded-full border border-teal-100"
+          >
             {t.bookBadge}
-          </span>
-          <h2 className="mt-4 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+          </motion.span>
+          <motion.h2 
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="mt-4 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl font-serif"
+          >
             {t.bookTitle}
-          </h2>
-          <p className="mt-4 text-base text-slate-500 font-normal max-w-2xl mx-auto">
+          </motion.h2>
+          <p className="mt-4 text-base text-slate-500 font-normal max-w-2xl mx-auto font-sans">
             {t.bookSubtitle}
           </p>
-          <div className="mt-4 h-1 w-20 bg-teal-500 mx-auto rounded-full" />
+          <div className="mt-4 h-[1px] w-16 bg-teal-500 mx-auto" />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
           
           {/* Appointment Form Column (7 cols) */}
           <div className="lg:col-span-7">
-            <div id="booking-form-card" className="rounded-3xl border border-slate-100 bg-white p-6 sm:p-8 shadow-xl relative">
-              <div className="absolute top-0 inset-x-0 h-2 rounded-t-3xl bg-gradient-to-r from-teal-500 to-emerald-500" />
+            <motion.div 
+              layout
+              id="booking-form-card" 
+              className="rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-xl relative overflow-hidden"
+            >
+              <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-teal-500 to-emerald-500" />
               
-              {isSuccess && latestAppt ? (
-                // Success screen
-                <div id="booking-success-view" className="text-center py-8 space-y-6">
-                  <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 border-2 border-emerald-100 animate-bounce">
-                    <CheckCircle className="h-10 w-10" />
-                  </div>
-                  <div className="space-y-2">
-                    <h3 className="text-2xl font-extrabold text-slate-900">{t.bookFormSuccess}</h3>
-                    <p className="text-sm text-slate-600 max-w-md mx-auto">{t.bookFormSuccessSub}</p>
-                  </div>
-
-                  {/* Summary of Appointment */}
-                  <div className="max-w-md mx-auto p-5 rounded-2xl border border-emerald-100 bg-emerald-50/30 text-left space-y-3">
-                    <div className="flex justify-between border-b border-emerald-100/50 pb-2">
-                      <span className="text-xs font-bold uppercase text-slate-400">ID / Dept</span>
-                      <span className="text-sm font-bold text-slate-800">{latestAppt.id} - <span className="text-teal-700">{latestAppt.departmentName}</span></span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-xs font-bold text-slate-500">{language === 'en' ? 'Patient Name' : 'मरीज का नाम'}</span>
-                      <span className="text-sm font-semibold text-slate-800">{latestAppt.patientName}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-xs font-bold text-slate-500">{language === 'en' ? 'Appointment Date' : 'अपॉइंटमेंट की तारीख'}</span>
-                      <span className="text-sm font-bold text-slate-800">{latestAppt.date}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-xs font-bold text-slate-500">{language === 'en' ? 'Time Slot' : 'पसंदीदा समय'}</span>
-                      <span className="text-sm font-bold text-slate-800">{latestAppt.timeSlot}</span>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4">
-                    <button
-                      onClick={() => handleDownloadSlip(latestAppt)}
-                      className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-teal-600 px-5 py-3 text-sm font-bold text-white shadow-xs hover:bg-teal-700 cursor-pointer active:scale-95"
-                    >
-                      <Download className="h-4 w-4" />
-                      <span>{t.apptDownloadSlip}</span>
-                    </button>
-                    <button
-                      onClick={() => {
-                        setIsSuccess(false);
-                        setLatestAppt(null);
-                      }}
-                      className="px-5 py-3 text-sm font-semibold text-slate-700 border border-slate-200 rounded-xl hover:bg-slate-50 cursor-pointer"
-                    >
-                      {language === 'en' ? 'Book Another Visit' : 'एक और अपॉइंटमेंट बुक करें'}
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                // Booking form
-                <form onSubmit={handleBookingSubmit} className="space-y-6">
-                  <h3 className="text-xl font-bold text-slate-800 border-b border-slate-50 pb-4 flex items-center gap-2">
-                    <Activity className="h-5.5 w-5.5 text-teal-600" />
-                    <span>{language === 'en' ? 'Request Consultation' : 'परामर्श का अनुरोध करें'}</span>
-                  </h3>
-
-                  {errorMsg && (
-                    <div className="p-4 rounded-xl bg-rose-50 border border-rose-100 text-rose-800 text-xs sm:text-sm flex items-center gap-2">
-                      <AlertCircle className="h-4.5 w-4.5 text-rose-600 shrink-0" />
-                      <span>{errorMsg}</span>
-                    </div>
-                  )}
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                    {/* Patient Name */}
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-500 uppercase flex items-center gap-1">
-                        <User className="h-3.5 w-3.5" />
-                        <span>{t.bookFormName} <span className="text-rose-500">*</span></span>
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={patientName}
-                        onChange={(e) => setPatientName(e.target.value)}
-                        placeholder="e.g. Satish Kumar Sahu"
-                        className="w-full rounded-xl border border-slate-200 bg-white p-3.5 text-sm focus:border-teal-500 focus:outline-hidden text-slate-800 placeholder-slate-400 font-medium"
-                      />
-                    </div>
-
-                    {/* Patient Phone */}
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-500 uppercase flex items-center gap-1">
-                        <Phone className="h-3.5 w-3.5" />
-                        <span>{t.bookFormPhone} <span className="text-rose-500">*</span></span>
-                      </label>
-                      <input
-                        type="tel"
-                        required
-                        maxLength={10}
-                        value={patientPhone}
-                        onChange={(e) => setPatientPhone(e.target.value.replace(/\D/g, ''))}
-                        placeholder="e.g. 7714050625"
-                        className="w-full rounded-xl border border-slate-200 bg-white p-3.5 text-sm focus:border-teal-500 focus:outline-hidden text-slate-800 placeholder-slate-400 font-medium"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-                    {/* Age */}
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-500 uppercase">
-                        <span>{t.bookFormAge} <span className="text-rose-500">*</span></span>
-                      </label>
-                      <input
-                        type="number"
-                        required
-                        min="1"
-                        max="120"
-                        value={patientAge}
-                        onChange={(e) => setPatientAge(e.target.value)}
-                        placeholder="e.g. 28"
-                        className="w-full rounded-xl border border-slate-200 bg-white p-3.5 text-sm focus:border-teal-500 focus:outline-hidden text-slate-800 font-medium"
-                      />
-                    </div>
-
-                    {/* Gender */}
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-500 uppercase">
-                        <span>{t.bookFormGender}</span>
-                      </label>
-                      <select
-                        value={patientGender}
-                        onChange={(e) => setPatientGender(e.target.value)}
-                        className="w-full rounded-xl border border-slate-200 bg-white p-3.5 text-sm focus:border-teal-500 focus:outline-hidden text-slate-800 font-medium"
-                      >
-                        <option value="Male">{t.bookFormGenderM}</option>
-                        <option value="Female">{t.bookFormGenderF}</option>
-                        <option value="Other">{t.bookFormGenderO}</option>
-                      </select>
-                    </div>
-
-                    {/* Department */}
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-500 uppercase">
-                        <span>{t.bookFormDept}</span>
-                      </label>
-                      <select
-                        value={deptId}
-                        onChange={(e) => setDeptId(e.target.value)}
-                        className="w-full rounded-xl border border-slate-200 bg-white p-3.5 text-sm focus:border-teal-500 focus:outline-hidden text-slate-800 font-medium"
-                      >
-                        {DEPARTMENTS.map(d => (
-                          <option key={d.id} value={d.id}>{d.name[language]}</option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                    {/* Date */}
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-500 uppercase flex items-center gap-1">
-                        <Calendar className="h-3.5 w-3.5" />
-                        <span>{t.bookFormDate} <span className="text-rose-500">*</span></span>
-                      </label>
-                      <input
-                        type="date"
-                        required
-                        value={prefDate}
-                        onChange={(e) => setPrefDate(e.target.value)}
-                        className="w-full rounded-xl border border-slate-200 bg-white p-3.5 text-sm focus:border-teal-500 focus:outline-hidden text-slate-800 font-medium"
-                      />
-                    </div>
-
-                    {/* Time slots */}
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-500 uppercase flex items-center gap-1">
-                        <Clock className="h-3.5 w-3.5" />
-                        <span>{t.bookFormTime}</span>
-                      </label>
-                      <select
-                        value={prefTime}
-                        onChange={(e) => setPrefTime(e.target.value)}
-                        className="w-full rounded-xl border border-slate-200 bg-white p-3.5 text-sm focus:border-teal-500 focus:outline-hidden text-slate-800 font-medium"
-                      >
-                        {timeSlots.map(slot => (
-                          <option key={slot} value={slot}>{slot}</option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* Symptoms */}
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-500 uppercase flex items-center gap-1">
-                      <HelpCircle className="h-3.5 w-3.5" />
-                      <span>{t.bookFormSymptoms}</span>
-                    </label>
-                    <textarea
-                      rows={3}
-                      value={symptoms}
-                      onChange={(e) => setSymptoms(e.target.value)}
-                      placeholder={language === 'en' ? "e.g. Mild pregnancy checkup / infant vaccination schedule" : "जैसे- सामान्य स्वास्थ्य जांच / टीकाकरण परामर्श"}
-                      className="w-full rounded-xl border border-slate-200 bg-white p-3.5 text-sm focus:border-teal-500 focus:outline-hidden text-slate-800 font-medium"
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-teal-600 px-6 py-4 text-base font-bold text-white shadow-md hover:bg-teal-700 transition cursor-pointer active:scale-95"
+              <AnimatePresence mode="wait">
+                {isSuccess && latestAppt ? (
+                  // Success screen
+                  <motion.div 
+                    key="success"
+                    initial={{ opacity: 0, scale: 0.9, y: 15 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.9, y: -15 }}
+                    transition={{ type: "spring", duration: 0.5, bounce: 0.15 }}
+                    id="booking-success-view" 
+                    className="text-center py-8 space-y-6"
                   >
-                    <span>{t.bookFormSubmit}</span>
-                  </button>
-                </form>
-              )}
-            </div>
+                    <motion.div 
+                      initial={{ scale: 0 }}
+                      animate={{ scale: [0, 1.2, 1] }}
+                      transition={{ delay: 0.15, duration: 0.4 }}
+                      className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 border-2 border-emerald-100"
+                    >
+                      <CheckCircle className="h-10 w-10" />
+                    </motion.div>
+                    <div className="space-y-2">
+                      <h3 className="text-2xl font-extrabold text-slate-900 font-serif">{t.bookFormSuccess}</h3>
+                      <p className="text-sm text-slate-600 max-w-md mx-auto">{t.bookFormSuccessSub}</p>
+                    </div>
+
+                    {/* Summary of Appointment */}
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.3 }}
+                      className="max-w-md mx-auto p-5 rounded-2xl border border-emerald-100 bg-emerald-50/30 text-left space-y-3"
+                    >
+                      <div className="flex justify-between border-b border-emerald-100/50 pb-2">
+                        <span className="text-[10px] font-bold uppercase text-slate-400">ID / Dept</span>
+                        <span className="text-sm font-bold text-slate-800">{latestAppt.id} - <span className="text-teal-700">{latestAppt.departmentName}</span></span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-xs font-bold text-slate-500 font-sans">{language === 'en' ? 'Patient Name' : 'मरीज का नाम'}</span>
+                        <span className="text-sm font-semibold text-slate-800 font-sans">{latestAppt.patientName}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-xs font-bold text-slate-500 font-sans">{language === 'en' ? 'Appointment Date' : 'अपॉइंटमेंट की तारीख'}</span>
+                        <span className="text-sm font-bold text-slate-800 font-sans">{latestAppt.date}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-xs font-bold text-slate-500 font-sans">{language === 'en' ? 'Time Slot' : 'पसंदीदा समय'}</span>
+                        <span className="text-sm font-bold text-slate-800 font-sans">{latestAppt.timeSlot}</span>
+                      </div>
+                    </motion.div>
+
+                    <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4">
+                      <motion.button
+                        whileHover={{ scale: 1.03 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => handleDownloadSlip(latestAppt)}
+                        className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-teal-600 px-5 py-3 text-sm font-bold text-white shadow-md hover:bg-teal-700 cursor-pointer"
+                      >
+                        <Download className="h-4 w-4" />
+                        <span>{t.apptDownloadSlip}</span>
+                      </motion.button>
+                      <button
+                        onClick={() => {
+                          setIsSuccess(false);
+                          setLatestAppt(null);
+                        }}
+                        className="px-5 py-3 text-sm font-semibold text-slate-700 border border-slate-200 rounded-xl hover:bg-slate-50 cursor-pointer"
+                      >
+                        {language === 'en' ? 'Book Another Visit' : 'एक और अपॉइंटमेंट बुक करें'}
+                      </button>
+                    </div>
+                  </motion.div>
+                ) : (
+                  // Booking form
+                  <motion.form 
+                    key="form"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    onSubmit={handleBookingSubmit} 
+                    className="space-y-6"
+                  >
+                    <h3 className="text-xl font-bold text-slate-800 border-b border-slate-50 pb-4 flex items-center gap-2 font-serif">
+                      <Activity className="h-5.5 w-5.5 text-teal-600" />
+                      <span>{language === 'en' ? 'Request Consultation' : 'परामर्श का अनुरोध करें'}</span>
+                    </h3>
+
+                    {errorMsg && (
+                      <motion.div 
+                        initial={{ opacity: 0, y: -5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="p-4 rounded-xl bg-rose-50 border border-rose-100 text-rose-800 text-xs sm:text-sm flex items-center gap-2"
+                      >
+                        <AlertCircle className="h-4.5 w-4.5 text-rose-600 shrink-0" />
+                        <span>{errorMsg}</span>
+                      </motion.div>
+                    )}
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                      {/* Patient Name */}
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-slate-500 uppercase flex items-center gap-1 font-sans">
+                          <User className="h-3.5 w-3.5" />
+                          <span>{t.bookFormName} <span className="text-rose-500">*</span></span>
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={patientName}
+                          onChange={(e) => setPatientName(e.target.value)}
+                          placeholder="e.g. Satish Kumar Sahu"
+                          className="w-full rounded-xl border border-slate-200 bg-white p-3.5 text-sm focus:border-teal-500 focus:outline-hidden text-slate-800 placeholder-slate-400 font-medium font-sans"
+                        />
+                      </div>
+
+                      {/* Patient Phone */}
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-slate-500 uppercase flex items-center gap-1 font-sans">
+                          <Phone className="h-3.5 w-3.5" />
+                          <span>{t.bookFormPhone} <span className="text-rose-500">*</span></span>
+                        </label>
+                        <input
+                          type="tel"
+                          required
+                          maxLength={10}
+                          value={patientPhone}
+                          onChange={(e) => setPatientPhone(e.target.value.replace(/\D/g, ''))}
+                          placeholder="e.g. 7714050625"
+                          className="w-full rounded-xl border border-slate-200 bg-white p-3.5 text-sm focus:border-teal-500 focus:outline-hidden text-slate-800 placeholder-slate-400 font-medium font-sans"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                      {/* Age */}
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-slate-500 uppercase font-sans">
+                          <span>{t.bookFormAge} <span className="text-rose-500">*</span></span>
+                        </label>
+                        <input
+                          type="number"
+                          required
+                          min="1"
+                          max="120"
+                          value={patientAge}
+                          onChange={(e) => setPatientAge(e.target.value)}
+                          placeholder="e.g. 28"
+                          className="w-full rounded-xl border border-slate-200 bg-white p-3.5 text-sm focus:border-teal-500 focus:outline-hidden text-slate-800 font-medium font-sans"
+                        />
+                      </div>
+
+                      {/* Gender */}
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-slate-500 uppercase font-sans">
+                          <span>{t.bookFormGender}</span>
+                        </label>
+                        <select
+                          value={patientGender}
+                          onChange={(e) => setPatientGender(e.target.value)}
+                          className="w-full rounded-xl border border-slate-200 bg-white p-3.5 text-sm focus:border-teal-500 focus:outline-hidden text-slate-800 font-medium font-sans"
+                        >
+                          <option value="Male">{t.bookFormGenderM}</option>
+                          <option value="Female">{t.bookFormGenderF}</option>
+                          <option value="Other">{t.bookFormGenderO}</option>
+                        </select>
+                      </div>
+
+                      {/* Department */}
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-slate-500 uppercase font-sans">
+                          <span>{t.bookFormDept}</span>
+                        </label>
+                        <select
+                          value={deptId}
+                          onChange={(e) => setDeptId(e.target.value)}
+                          className="w-full rounded-xl border border-slate-200 bg-white p-3.5 text-sm focus:border-teal-500 focus:outline-hidden text-slate-800 font-medium font-sans"
+                        >
+                          {DEPARTMENTS.map(d => (
+                            <option key={d.id} value={d.id}>{d.name[language]}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                      {/* Date */}
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-slate-500 uppercase flex items-center gap-1 font-sans">
+                          <Calendar className="h-3.5 w-3.5" />
+                          <span>{t.bookFormDate} <span className="text-rose-500">*</span></span>
+                        </label>
+                        <input
+                          type="date"
+                          required
+                          value={prefDate}
+                          onChange={(e) => setPrefDate(e.target.value)}
+                          className="w-full rounded-xl border border-slate-200 bg-white p-3.5 text-sm focus:border-teal-500 focus:outline-hidden text-slate-800 font-medium font-sans"
+                        />
+                      </div>
+
+                      {/* Time slots */}
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-slate-500 uppercase flex items-center gap-1 font-sans">
+                          <Clock className="h-3.5 w-3.5" />
+                          <span>{t.bookFormTime}</span>
+                        </label>
+                        <select
+                          value={prefTime}
+                          onChange={(e) => setPrefTime(e.target.value)}
+                          className="w-full rounded-xl border border-slate-200 bg-white p-3.5 text-sm focus:border-teal-500 focus:outline-hidden text-slate-800 font-medium font-sans"
+                        >
+                          {timeSlots.map(slot => (
+                            <option key={slot} value={slot}>{slot}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Symptoms */}
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-500 uppercase flex items-center gap-1 font-sans">
+                        <HelpCircle className="h-3.5 w-3.5" />
+                        <span>{t.bookFormSymptoms}</span>
+                      </label>
+                      <textarea
+                        rows={3}
+                        value={symptoms}
+                        onChange={(e) => setSymptoms(e.target.value)}
+                        placeholder={language === 'en' ? "e.g. Mild pregnancy checkup / infant vaccination schedule" : "जैसे- सामान्य स्वास्थ्य जांच / टीकाकरण परामर्श"}
+                        className="w-full rounded-xl border border-slate-200 bg-white p-3.5 text-sm focus:border-teal-500 focus:outline-hidden text-slate-800 font-medium font-sans"
+                      />
+                    </div>
+
+                    <motion.button
+                      type="submit"
+                      whileHover={{ scale: 1.015 }}
+                      whileTap={{ scale: 0.985 }}
+                      className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-teal-600 px-6 py-4 text-base font-bold text-white shadow-md hover:bg-teal-700 transition cursor-pointer"
+                    >
+                      <span>{t.bookFormSubmit}</span>
+                    </motion.button>
+                  </motion.form>
+                )}
+              </AnimatePresence>
+            </motion.div>
           </div>
 
           {/* Appointments Manager Column (5 cols) */}
           <div className="lg:col-span-5 space-y-6">
-            <div id="manager-card" className="rounded-3xl border border-slate-100 bg-slate-50/50 p-6 shadow-xs">
-              <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <div id="manager-card" className="rounded-3xl border border-slate-200 bg-slate-50/50 p-6 shadow-xs">
+              <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2 font-serif">
                 <Award className="h-5.5 w-5.5 text-teal-600 animate-pulse" />
                 <span>{t.appointmentsManagerTitle}</span>
               </h3>
-              <p className="text-xs text-slate-500 mt-1 leading-normal mb-6">
+              <p className="text-xs text-slate-500 mt-1 leading-normal mb-6 font-sans">
                 {t.appointmentsManagerSub}
               </p>
 
-              {appointments.length === 0 ? (
-                <div className="text-center py-10 bg-white border border-dashed border-slate-200 rounded-2xl p-6">
-                  <Calendar className="h-8 w-8 mx-auto text-slate-300 mb-3" />
-                  <p className="text-xs font-medium text-slate-500 leading-normal">
-                    {t.apptNoRecords}
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-4 max-h-[500px] overflow-y-auto pr-1">
-                  {appointments.map((appt) => (
-                    <div 
-                      key={appt.id} 
-                      className="p-4 rounded-2xl border border-slate-100 bg-white shadow-xs relative space-y-3"
-                    >
-                      {/* Top bar info */}
-                      <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-bold text-slate-400 bg-slate-50 border border-slate-100 px-2 py-0.5 rounded-md">
-                          ID: {appt.id}
-                        </span>
-                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700">
-                          ● {t.apptStatusScheduled}
-                        </span>
-                      </div>
-
-                      {/* Patient metadata */}
-                      <div>
-                        <h4 className="text-sm font-bold text-slate-800 leading-normal">
-                          {appt.patientName}
-                        </h4>
-                        <p className="text-xs font-bold text-teal-600 mt-0.5">
-                          {appt.departmentName}
-                        </p>
-                      </div>
-
-                      {/* Visit details */}
-                      <div className="text-xs text-slate-500 space-y-1 pt-1.5 border-t border-slate-50">
-                        <div className="flex items-center gap-1.5 font-medium">
-                          <Calendar className="h-3.5 w-3.5 text-slate-400" />
-                          <span>{appt.date}</span>
+              <AnimatePresence mode="popLayout">
+                {appointments.length === 0 ? (
+                  <motion.div 
+                    key="empty"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="text-center py-10 bg-white border border-dashed border-slate-200 rounded-2xl p-6 cursor-default"
+                  >
+                    <Calendar className="h-8 w-8 mx-auto text-slate-300 mb-3" />
+                    <p className="text-xs font-medium text-slate-500 leading-normal font-sans">
+                      {t.apptNoRecords}
+                    </p>
+                  </motion.div>
+                ) : (
+                  <div className="space-y-4 max-h-[500px] overflow-y-auto pr-1">
+                    {appointments.map((appt) => (
+                      <motion.div 
+                        key={appt.id} 
+                        layout
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, scale: 0.9, x: -20 }}
+                        whileHover={{ y: -2 }}
+                        className="p-4 rounded-2xl border border-slate-200 bg-white shadow-xs relative space-y-3 cursor-default"
+                      >
+                        {/* Top bar info */}
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-bold text-slate-400 bg-slate-50 border border-slate-100 px-2 py-0.5 rounded-md font-sans">
+                            ID: {appt.id}
+                          </span>
+                          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700 font-sans">
+                            ● {t.apptStatusScheduled}
+                          </span>
                         </div>
-                        <div className="flex items-center gap-1.5 font-medium">
-                          <Clock className="h-3.5 w-3.5 text-slate-400" />
-                          <span>{appt.timeSlot}</span>
+
+                        {/* Patient metadata */}
+                        <div>
+                          <h4 className="text-sm font-bold text-slate-800 leading-normal font-sans">
+                            {appt.patientName}
+                          </h4>
+                          <p className="text-xs font-bold text-teal-600 mt-0.5 font-sans">
+                            {appt.departmentName}
+                          </p>
                         </div>
-                      </div>
 
-                      {/* Buttons strip */}
-                      <div className="flex justify-between items-center pt-2 border-t border-slate-50">
-                        <button
-                          onClick={() => handleCancelAppointment(appt.id)}
-                          className="text-[11px] font-bold text-rose-500 hover:text-rose-600 cursor-pointer flex items-center gap-1 p-1 hover:bg-rose-50 rounded-lg transition"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                          <span>{t.apptActionCancel}</span>
-                        </button>
-                        <button
-                          onClick={() => handleDownloadSlip(appt)}
-                          className="text-[11px] font-bold text-teal-600 hover:text-teal-700 cursor-pointer flex items-center gap-1 p-1 hover:bg-teal-50 rounded-lg transition"
-                        >
-                          <Download className="h-3.5 w-3.5" />
-                          <span>{t.apptDownloadSlip}</span>
-                        </button>
-                      </div>
+                        {/* Visit details */}
+                        <div className="text-xs text-slate-500 space-y-1 pt-1.5 border-t border-slate-100">
+                          <div className="flex items-center gap-1.5 font-medium font-sans">
+                            <Calendar className="h-3.5 w-3.5 text-slate-400" />
+                            <span>{appt.date}</span>
+                          </div>
+                          <div className="flex items-center gap-1.5 font-medium font-sans">
+                            <Clock className="h-3.5 w-3.5 text-slate-400" />
+                            <span>{appt.timeSlot}</span>
+                          </div>
+                        </div>
 
-                    </div>
-                  ))}
-                </div>
-              )}
+                        {/* Buttons strip */}
+                        <div className="flex justify-between items-center pt-2 border-t border-slate-100">
+                          <button
+                            onClick={() => handleCancelAppointment(appt.id)}
+                            className="text-[11px] font-bold text-rose-500 hover:text-rose-600 cursor-pointer flex items-center gap-1 p-1 hover:bg-rose-50 rounded-lg transition"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                            <span>{t.apptActionCancel}</span>
+                          </button>
+                          <button
+                            onClick={() => handleDownloadSlip(appt)}
+                            className="text-[11px] font-bold text-teal-600 hover:text-teal-700 cursor-pointer flex items-center gap-1 p-1 hover:bg-teal-50 rounded-lg transition"
+                          >
+                            <Download className="h-3.5 w-3.5" />
+                            <span>{t.apptDownloadSlip}</span>
+                          </button>
+                        </div>
+
+                      </motion.div>
+                    ))}
+                  </div>
+                )}
+              </AnimatePresence>
             </div>
 
             {/* Offline Support Notice */}
-            <div className="p-4 rounded-2xl border border-teal-100/50 bg-teal-50/20 text-teal-800 text-xs flex gap-2">
-              <Sparkles className="h-4.5 w-4.5 text-teal-600 shrink-0 mt-0.5" />
+            <motion.div 
+              whileHover={{ scale: 1.01 }}
+              className="p-4 rounded-2xl border border-teal-100/50 bg-teal-50/20 text-teal-800 text-xs flex gap-2 cursor-default"
+            >
+              <Sparkles className="h-4.5 w-4.5 text-teal-600 shrink-0 mt-0.5 animate-pulse" />
               <div>
                 <span className="font-bold">{language === 'en' ? 'Local Persistence' : 'स्थानीय संचय'}: </span>
-                <span>
+                <span className="font-sans">
                   {language === 'en'
                     ? "Your scheduled visits are saved in your browser storage so you can easily trace, verify, download, or reschedule them at any time."
                     : "आपके अनुसूचित दौरे आपके ब्राउज़र स्टोरेज में सुरक्षित सहेजे गए हैं ताकि आप किसी भी समय आसानी से ट्रैक, सत्यापित, या डाउनलोड कर सकें।"
                   }
                 </span>
               </div>
-            </div>
+            </motion.div>
           </div>
 
         </div>

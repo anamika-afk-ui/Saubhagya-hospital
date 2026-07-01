@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Sparkles, Trash2, Bot, User, Phone, Info, HelpCircle } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Language, translations } from '../types';
 
 interface Message {
@@ -122,28 +123,43 @@ export default function AiAssistant({ language }: AiAssistantProps) {
   };
 
   return (
-    <section id="ai-chat-section" className="py-12 sm:py-16 bg-slate-50/50 border-t border-slate-100">
+    <section id="ai-chat-section" className="py-12 sm:py-16 bg-slate-50/50 border-t border-slate-100 overflow-hidden">
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-8">
-          <span className="text-xs font-bold uppercase tracking-widest text-teal-600 bg-teal-50 px-3 py-1 rounded-full border border-teal-100 flex items-center gap-1 w-fit mx-auto">
+          <motion.span 
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            className="text-xs font-bold uppercase tracking-widest text-teal-600 bg-teal-50 px-3 py-1 rounded-full border border-teal-100 flex items-center gap-1 w-fit mx-auto"
+          >
             <Sparkles className="h-3.5 w-3.5 text-teal-600 animate-pulse" />
             <span>AI SWASTHYA MITRA</span>
-          </span>
-          <h2 className="mt-4 text-3xl font-extrabold tracking-tight text-slate-900">
+          </motion.span>
+          <motion.h2 
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mt-4 text-3xl font-extrabold tracking-tight text-slate-900 font-serif"
+          >
             {t.chatTitle}
-          </h2>
-          <p className="mt-2 text-sm sm:text-base text-slate-500 max-w-2xl mx-auto">
+          </motion.h2>
+          <p className="mt-2 text-sm sm:text-base text-slate-500 max-w-2xl mx-auto font-sans">
             {t.chatSubtitle}
           </p>
         </div>
 
         {/* Chat Wrapper Box */}
-        <div id="chat-frame" className="rounded-3xl border border-slate-100 bg-white shadow-xl overflow-hidden flex flex-col h-[580px] relative">
-          
+        <motion.div 
+          initial={{ opacity: 0, y: 25 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.55 }}
+          id="chat-frame" 
+          className="rounded-3xl border border-slate-200 bg-white shadow-xl overflow-hidden flex flex-col h-[580px] relative"
+        >
           {/* Chat Header */}
-          <div className="bg-slate-900 text-white p-4 sm:px-6 flex items-center justify-between">
+          <div className="bg-slate-900 text-white p-4 sm:px-6 flex items-center justify-between z-10">
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-full bg-teal-500/10 border border-teal-500/40 flex items-center justify-center text-teal-400">
                 <Bot className="h-5.5 w-5.5" />
@@ -160,15 +176,20 @@ export default function AiAssistant({ language }: AiAssistantProps) {
             </div>
 
             {/* Actions */}
-            {messages.length > 0 && (
-              <button
-                onClick={handleClearChat}
-                className="text-slate-400 hover:text-rose-400 transition focus:outline-hidden p-1.5 rounded-lg hover:bg-slate-800 cursor-pointer"
-                title={language === 'en' ? 'Clear History' : 'इतिहास मिटाएं'}
-              >
-                <Trash2 className="h-4.5 w-4.5" />
-              </button>
-            )}
+            <AnimatePresence>
+              {messages.length > 0 && (
+                <motion.button
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  onClick={handleClearChat}
+                  className="text-slate-400 hover:text-rose-400 transition focus:outline-hidden p-1.5 rounded-lg hover:bg-slate-800 cursor-pointer"
+                  title={language === 'en' ? 'Clear History' : 'इतिहास मिटाएं'}
+                >
+                  <Trash2 className="h-4.5 w-4.5" />
+                </motion.button>
+              )}
+            </AnimatePresence>
           </div>
 
           {/* Chat Area Scroll panel */}
@@ -182,83 +203,103 @@ export default function AiAssistant({ language }: AiAssistantProps) {
               </p>
             </div>
 
-            {/* Welcome messages */}
-            <div className="flex items-start gap-3 max-w-[85%]">
+            {/* Welcome message */}
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="flex items-start gap-3 max-w-[85%]"
+            >
               <div className="h-8 w-8 rounded-full bg-slate-900 text-teal-400 flex items-center justify-center text-xs font-bold shrink-0 shadow-xs">
                 AI
               </div>
-              <div className="bg-white border border-slate-100 rounded-2xl rounded-tl-xs p-4 shadow-xs text-sm text-slate-800 leading-relaxed font-medium">
+              <div className="bg-white border border-slate-200 rounded-2xl rounded-tl-xs p-4 shadow-xs text-sm text-slate-800 leading-relaxed font-medium font-sans">
                 {t.chatWelcome}
               </div>
-            </div>
+            </motion.div>
 
             {/* Conversation Log */}
-            {messages.map((msg) => (
-              <div 
-                key={msg.id} 
-                className={`flex items-start gap-3 max-w-[85%] ${
-                  msg.role === 'user' ? 'ml-auto flex-row-reverse' : ''
-                }`}
-              >
-                {/* Avatar */}
-                <div className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 shadow-xs ${
-                  msg.role === 'user' 
-                    ? 'bg-teal-600 text-white' 
-                    : 'bg-slate-900 text-teal-400'
-                }`}>
-                  {msg.role === 'user' ? <User className="h-4 w-4" /> : 'AI'}
-                </div>
-
-                {/* Message Bubble */}
-                <div className={`p-4 rounded-2xl text-sm leading-relaxed ${
-                  msg.role === 'user' 
-                    ? 'bg-teal-600 text-white rounded-tr-xs font-medium' 
-                    : 'bg-white border border-slate-100 text-slate-800 rounded-tl-xs shadow-xs font-normal whitespace-pre-line'
-                }`}>
-                  <p>{msg.content}</p>
-                  <span className={`block text-[10px] mt-2 text-right ${
-                    msg.role === 'user' ? 'text-teal-100' : 'text-slate-400'
+            <AnimatePresence mode="popLayout">
+              {messages.map((msg) => (
+                <motion.div 
+                  key={msg.id} 
+                  initial={{ opacity: 0, y: 15, scale: 0.97 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  className={`flex items-start gap-3 max-w-[85%] ${
+                    msg.role === 'user' ? 'ml-auto flex-row-reverse' : ''
+                  }`}
+                >
+                  {/* Avatar */}
+                  <div className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 shadow-xs ${
+                    msg.role === 'user' 
+                      ? 'bg-teal-600 text-white' 
+                      : 'bg-slate-900 text-teal-400'
                   }`}>
-                    {msg.timestamp}
-                  </span>
-                </div>
-              </div>
-            ))}
+                    {msg.role === 'user' ? <User className="h-4 w-4" /> : 'AI'}
+                  </div>
+
+                  {/* Message Bubble */}
+                  <div className={`p-4 rounded-2xl text-sm leading-relaxed ${
+                    msg.role === 'user' 
+                      ? 'bg-teal-600 text-white rounded-tr-xs font-medium font-sans' 
+                      : 'bg-white border border-slate-200 text-slate-800 rounded-tl-xs shadow-xs font-normal whitespace-pre-line font-sans'
+                  }`}>
+                    <p>{msg.content}</p>
+                    <span className={`block text-[10px] mt-2 text-right ${
+                      msg.role === 'user' ? 'text-teal-100' : 'text-slate-400'
+                    }`}>
+                      {msg.timestamp}
+                    </span>
+                  </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
 
             {/* Loader indicator */}
-            {isLoading && (
-              <div className="flex items-start gap-3 max-w-[80%] animate-pulse">
-                <div className="h-8 w-8 rounded-full bg-slate-900 text-teal-400 flex items-center justify-center text-xs font-bold shrink-0">
-                  AI
-                </div>
-                <div className="bg-white border border-slate-100 rounded-2xl rounded-tl-xs p-4 shadow-xs text-sm text-slate-400 flex items-center gap-1.5">
-                  <span className="h-2 w-2 rounded-full bg-slate-400 animate-bounce" />
-                  <span className="h-2 w-2 rounded-full bg-slate-400 animate-bounce [animation-delay:0.2s]" />
-                  <span className="h-2 w-2 rounded-full bg-slate-400 animate-bounce [animation-delay:0.4s]" />
-                </div>
-              </div>
-            )}
+            <AnimatePresence>
+              {isLoading && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  className="flex items-start gap-3 max-w-[80%]"
+                >
+                  <div className="h-8 w-8 rounded-full bg-slate-900 text-teal-400 flex items-center justify-center text-xs font-bold shrink-0">
+                    AI
+                  </div>
+                  <div className="bg-white border border-slate-200 rounded-2xl rounded-tl-xs p-4 shadow-xs text-sm text-slate-400 flex items-center gap-1.5">
+                    <span className="h-2 w-2 rounded-full bg-slate-400 animate-bounce" />
+                    <span className="h-2 w-2 rounded-full bg-slate-400 animate-bounce [animation-delay:0.15s]" />
+                    <span className="h-2 w-2 rounded-full bg-slate-400 animate-bounce [animation-delay:0.3s]" />
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             <div ref={messagesEndRef} />
           </div>
 
           {/* Quick Prompts Panel */}
-          <div className="px-4 py-2 bg-slate-50 border-t border-slate-50 flex gap-2 overflow-x-auto whitespace-nowrap scrollbar-none">
+          <div className="px-4 py-2 bg-slate-50 border-t border-slate-150 flex gap-2 overflow-x-auto whitespace-nowrap scrollbar-none">
             {promptChips.map((chip, idx) => (
-              <button
+              <motion.button
                 key={idx}
+                whileHover={{ scale: 1.04, y: -1 }}
+                whileTap={{ scale: 0.96 }}
                 onClick={() => handleSendMessage(chip)}
                 disabled={isLoading}
-                className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-slate-600 hover:border-teal-500 hover:text-teal-600 transition cursor-pointer disabled:opacity-55 disabled:cursor-not-allowed"
+                className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-slate-600 hover:border-teal-500 hover:text-teal-600 transition cursor-pointer disabled:opacity-55 disabled:cursor-not-allowed font-sans"
               >
                 <HelpCircle className="h-3 w-3" />
                 <span>{chip}</span>
-              </button>
+              </motion.button>
             ))}
           </div>
 
           {/* Send Area Input */}
-          <div className="p-4 bg-white border-t border-slate-100">
+          <div className="p-4 bg-white border-t border-slate-200">
             <form 
               onSubmit={(e) => {
                 e.preventDefault();
@@ -272,19 +313,21 @@ export default function AiAssistant({ language }: AiAssistantProps) {
                 onChange={(e) => setInput(e.target.value)}
                 disabled={isLoading}
                 placeholder={t.chatPlaceholder}
-                className="flex-1 rounded-xl border border-slate-200 bg-white px-4 py-3.5 text-sm focus:border-teal-500 focus:outline-hidden text-slate-800 placeholder-slate-400 font-medium disabled:bg-slate-50 disabled:cursor-not-allowed"
+                className="flex-1 rounded-xl border border-slate-200 bg-white px-4 py-3.5 text-sm focus:border-teal-500 focus:outline-hidden text-slate-800 placeholder-slate-400 font-medium disabled:bg-slate-50 disabled:cursor-not-allowed font-sans"
               />
-              <button
+              <motion.button
                 type="submit"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 disabled={!input.trim() || isLoading}
-                className="h-12 w-12 shrink-0 rounded-xl bg-teal-600 hover:bg-teal-700 text-white flex items-center justify-center transition cursor-pointer active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="h-12 w-12 shrink-0 rounded-xl bg-teal-600 hover:bg-teal-700 text-white flex items-center justify-center transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <Send className="h-5 w-5" />
-              </button>
+              </motion.button>
             </form>
           </div>
 
-        </div>
+        </motion.div>
       </div>
     </section>
   );

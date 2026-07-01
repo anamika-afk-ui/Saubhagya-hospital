@@ -184,6 +184,57 @@ export default function Appointments({ language, selectedDeptId, onClearSelected
         format: 'a4'
       });
 
+      // Helper to map and sanitize localized date/time to English to avoid pdf character bugs
+      const getEnglishDate = (dateStr: string): string => {
+        if (!dateStr) return "";
+        // If it is in YYYY-MM-DD format (like "2026-07-01")
+        if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+          const [y, m, d] = dateStr.split('-');
+          const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+          const monthIdx = parseInt(m, 10) - 1;
+          if (monthIdx >= 0 && monthIdx < 12) {
+            return `${parseInt(d, 10)} ${months[monthIdx]} ${y}`;
+          }
+        }
+        
+        // If it contains Hindi words for months, map them
+        let clean = dateStr;
+        const translationMap: Record<string, string> = {
+          "जनवरी": "Jan", "फ़रवरी": "Feb", "मार्च": "Mar", "अप्रैल": "Apr", "मई": "May", "जून": "Jun",
+          "जुलाई": "Jul", "अगस्त": "Aug", "सितम्बर": "Sep", "अक्टूबर": "Oct", "नवम्बर": "Nov", "दिसम्बर": "Dec",
+          "जन.": "Jan", "फ़र.": "Feb", "मार्च.": "Mar", "अप्रै.": "Apr", "मई.": "May", "जून.": "Jun",
+          "जुला.": "Jul", "अग.": "Aug", "सित.": "Sep", "अक्टू.": "Oct", "नव.": "Nov", "दिस.": "Dec"
+        };
+
+        for (const [hi, en] of Object.entries(translationMap)) {
+          if (clean.includes(hi)) {
+            clean = clean.replace(new RegExp(hi, 'g'), en);
+          }
+        }
+
+        // Clean up Hindi numbers to English numbers if any
+        const hindiNums: Record<string, string> = {
+          "०": "0", "१": "1", "२": "2", "३": "3", "४": "4", "५": "5", "६": "6", "७": "7", "८": "8", "९": "9"
+        };
+        for (const [hi, en] of Object.entries(hindiNums)) {
+          clean = clean.replace(new RegExp(hi, 'g'), en);
+        }
+
+        // Clean up any remaining non-ASCII characters to keep the PDF compilation safe
+        return clean.replace(/[^\x00-\x7F]/g, "").trim() || dateStr;
+      };
+
+      // Resolve department to English to avoid Devanagari font crashes
+      const matchedDept = DEPARTMENTS.find(d => 
+        d.id === appt.departmentId || 
+        d.name.hi === appt.departmentName || 
+        d.name.en === appt.departmentName
+      );
+      const englishDeptName = matchedDept ? matchedDept.name.en : (appt.departmentName || "General Consultation");
+
+      const englishBookedAt = getEnglishDate(appt.bookedAt);
+      const englishConsultationDate = getEnglishDate(appt.date);
+
       // Top Accent Header Bar
       doc.setFillColor(13, 148, 136); // Teal-600 (#0d9488)
       doc.rect(0, 0, 210, 8, 'F');
@@ -249,7 +300,7 @@ export default function Appointments({ language, selectedDeptId, onClearSelected
       doc.text("Booked Date:", 25, 70);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(30, 41, 59);
-      doc.text(appt.bookedAt || "N/A", 55, 70);
+      doc.text(englishBookedAt || "N/A", 55, 70);
 
       // Patient Details Heading
       doc.setFont('helvetica', 'bold');
@@ -300,14 +351,14 @@ export default function Appointments({ language, selectedDeptId, onClearSelected
       doc.text("Department:", 25, 141);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(30, 41, 59);
-      doc.text(appt.departmentName, 65, 141);
+      doc.text(englishDeptName, 65, 141);
 
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(100, 116, 139);
       doc.text("Consultation Date:", 25, 148);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(30, 41, 59);
-      doc.text(appt.date, 65, 148);
+      doc.text(englishConsultationDate, 65, 148);
 
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(100, 116, 139);

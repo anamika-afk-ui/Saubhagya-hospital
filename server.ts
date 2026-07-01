@@ -116,6 +116,112 @@ app.post("/api/chat", async (req, res) => {
   }
 });
 
+// File-based database configuration for appointments and traffic stats
+import fs from "fs";
+
+const APPOINTMENTS_FILE = path.join(process.cwd(), "appointments.json");
+const TRAFFIC_FILE = path.join(process.cwd(), "traffic.json");
+
+// Helper to read JSON file safely
+function readJsonFile<T>(filePath: string, defaultValue: T): T {
+  try {
+    if (fs.existsSync(filePath)) {
+      const data = fs.readFileSync(filePath, "utf-8");
+      return JSON.parse(data) as T;
+    }
+  } catch (err) {
+    console.error(`Error reading file ${filePath}:`, err);
+  }
+  return defaultValue;
+}
+
+// Helper to write JSON file safely
+function writeJsonFile<T>(filePath: string, data: T): boolean {
+  try {
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf-8");
+    return true;
+  } catch (err) {
+    console.error(`Error writing file ${filePath}:`, err);
+    return false;
+  }
+}
+
+// API endpoint to log page visits (traffic)
+app.post("/api/traffic", (req, res) => {
+  try {
+    const { path: pagePath, referrer, userAgent } = req.body;
+    const traffic = readJsonFile<any[]>(TRAFFIC_FILE, []);
+    
+    const newVisit = {
+      id: `vis-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      timestamp: new Date().toISOString(),
+      path: pagePath || "/",
+      referrer: referrer || "Direct",
+      userAgent: userAgent || "Unknown",
+    };
+
+    traffic.push(newVisit);
+    // Keep last 10,000 visits to avoid unbounded growth
+    if (traffic.length > 10000) {
+      traffic.shift();
+    }
+    writeJsonFile(TRAFFIC_FILE, traffic);
+    res.json({ success: true });
+  } catch (err) {
+    console.error("Error logging traffic:", err);
+    res.status(500).json({ error: "Failed to log traffic" });
+  }
+});
+
+// API endpoint to get traffic stats
+app.get("/api/traffic", (req, res) => {
+  try {
+    const traffic = readJsonFile<any[]>(TRAFFIC_FILE, []);
+    res.json(traffic);
+  } catch (err) {
+    console.error("Error getting traffic:", err);
+    res.status(500).json({ error: "Failed to get traffic" });
+  }
+});
+
+// API endpoint to get all appointments
+app.get("/api/appointments", (req, res) => {
+  try {
+    const appointments = readJsonFile<any[]>(APPOINTMENTS_FILE, []);
+    res.json(appointments);
+  } catch (err) {
+    console.error("Error getting appointments:", err);
+    res.status(500).json({ error: "Failed to get appointments" });
+  }
+});
+
+// API endpoint to add or update an appointment
+app.post("/api/appointments", (req, res) => {
+  try {
+    const newAppt = req.body;
+    if (!newAppt || !newAppt.id) {
+      return res.status(400).json({ error: "Invalid appointment data" });
+    }
+
+    const appointments = readJsonFile<any[]>(APPOINTMENTS_FILE, []);
+    const index = appointments.findIndex(a => a.id === newAppt.id);
+
+    if (index !== -1) {
+      // Update existing (e.g., if cancelled)
+      appointments[index] = newAppt;
+    } else {
+      // Add new
+      appointments.unshift(newAppt);
+    }
+
+    writeJsonFile(APPOINTMENTS_FILE, appointments);
+    res.json({ success: true, appointment: newAppt });
+  } catch (err) {
+    console.error("Error saving appointment:", err);
+    res.status(500).json({ error: "Failed to save appointment" });
+  }
+});
+
 // Configure Vite or Static File Serving
 async function startServer() {
   if (process.env.NODE_ENV !== "production") {

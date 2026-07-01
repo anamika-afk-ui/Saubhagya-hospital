@@ -22,14 +22,28 @@ import Testimonials from './components/Testimonials';
 import Contact from './components/Contact';
 import Appointments from './components/Appointments';
 import AiAssistant from './components/AiAssistant';
+import AdminDashboard from './components/AdminDashboard';
 
 export default function App() {
   const [language, setLanguage] = useState<Language>('hi'); // Default to Hindi as requested by Raipur users
-  const [activeView, setActiveView] = useState<string>('home'); // 'home' | 'book' | 'chat'
+  const [activeView, setActiveView] = useState<string>('home'); // 'home' | 'book' | 'chat' | 'admin'
   const [selectedDeptId, setSelectedDeptId] = useState<string | undefined>(undefined);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const t = translations[language];
+
+  // Real-time Traffic/Visits Logging on Mount
+  useEffect(() => {
+    fetch('/api/traffic', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        path: window.location.pathname,
+        referrer: document.referrer || 'Direct',
+        userAgent: navigator.userAgent
+      })
+    }).catch(err => console.error("Error logging page traffic:", err));
+  }, []);
 
   // Language toggle handler
   const handleToggleLanguage = () => {
@@ -314,6 +328,18 @@ export default function App() {
               <AiAssistant language={language} />
             </motion.div>
           )}
+
+          {activeView === 'admin' && (
+            <motion.div
+              key="admin"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              transition={{ duration: 0.35, ease: "easeInOut" }}
+            >
+              <AdminDashboard language={language} onBack={() => setActiveView('home')} />
+            </motion.div>
+          )}
         </AnimatePresence>
       </main>
 
@@ -406,7 +432,13 @@ export default function App() {
           {/* Bottom Copyright and credit */}
           <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
             <p className="font-semibold text-center sm:text-left">
-              &copy; {new Date().getFullYear()} Saubhagya Hospital Raipur. All Rights Reserved.
+              &copy; {new Date().getFullYear()} Saubhagya Hospital Raipur. All Rights Reserved. •{' '}
+              <button 
+                onClick={() => { setActiveView('admin'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} 
+                className="hover:text-blue-500 font-bold underline transition bg-transparent border-0 cursor-pointer p-0"
+              >
+                {language === 'en' ? 'Staff Portal' : 'एडमिन / स्टाफ लॉगिन'}
+              </button>
             </p>
             <div className="flex items-center gap-1.5 font-bold text-teal-600">
               <Heart className="h-3.5 w-3.5 fill-rose-500 text-rose-500" />

@@ -136,6 +136,13 @@ export default function Appointments({ language, selectedDeptId, onClearSelected
     const updatedList = [newAppt, ...appointments];
     saveAppointments(updatedList);
 
+    // Sync appointment to server
+    fetch('/api/appointments', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newAppt)
+    }).catch(err => console.error("Error syncing appointment to server:", err));
+
     // Set success modal states
     setLatestAppt(newAppt);
     setIsSuccess(true);
@@ -149,8 +156,22 @@ export default function Appointments({ language, selectedDeptId, onClearSelected
 
   const handleCancelAppointment = (id: string) => {
     if (confirm(language === 'en' ? "Are you sure you want to cancel this appointment?" : "क्या आप वाकई इस अपॉइंटमेंट को रद्द करना चाहते हैं?")) {
-      const updated = appointments.filter(a => a.id !== id);
-      saveAppointments(updated);
+      const apptToCancel = appointments.find(a => a.id === id);
+      if (apptToCancel) {
+        const cancelledAppt = { ...apptToCancel, status: 'Cancelled' as const };
+        const updated = appointments.map(a => a.id === id ? cancelledAppt : a);
+        saveAppointments(updated);
+
+        // Sync cancellation to server
+        fetch('/api/appointments', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(cancelledAppt)
+        }).catch(err => console.error("Error syncing cancellation to server:", err));
+      } else {
+        const updated = appointments.filter(a => a.id !== id);
+        saveAppointments(updated);
+      }
     }
   };
 

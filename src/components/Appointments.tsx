@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Language, translations, DEPARTMENTS, Appointment } from '../types';
+import { jsPDF } from 'jspdf';
 
 interface AppointmentsProps {
   language: Language;
@@ -176,51 +177,188 @@ export default function Appointments({ language, selectedDeptId, onClearSelected
   };
 
   const handleDownloadSlip = (appt: Appointment) => {
-    // Elegant text booking receipt downloadable file
-    const fileContent = `
-========================================
-       SAUBHAGYA HOSPITAL RAIPUR
-========================================
-          APPOINTMENT SLIP
-========================================
-Receipt ID : ${appt.id}
-Date Booked: ${appt.bookedAt}
-Status     : ${appt.status === 'Scheduled' ? 'REGISTERED' : 'CANCELLED'}
+    try {
+      const doc = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
 
-PATIENT DETAILS:
-----------------------------------------
-Patient Name : ${appt.patientName}
-Age / Gender : ${appt.patientAge} Years / ${appt.patientGender}
-Contact No.  : ${appt.patientPhone}
+      // Top Accent Header Bar
+      doc.setFillColor(13, 148, 136); // Teal-600 (#0d9488)
+      doc.rect(0, 0, 210, 8, 'F');
 
-VISIT INFORMATION:
-----------------------------------------
-Department   : ${appt.departmentName}
-Consultation Date : ${appt.date}
-Preferred Slot    : ${appt.timeSlot}
-Key Symptoms      : ${appt.symptoms}
+      // Hospital Header Details
+      doc.setTextColor(30, 41, 59); // Slate-800
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(22);
+      doc.text("SAUBHAGYA HOSPITAL", 20, 25);
 
-IMPORTANT INSTRUCTIONS:
-----------------------------------------
-1. Please reach Saubhagya Hospital reception 15 minutes before your preferred time slot.
-2. Bring any previous medical files, prescription reports or active scans.
-3. For directions, search 'Saubhagya Hospital Sector 1 Shivanand Nagar Raipur' on Google Maps.
-4. For cancellation or assistance, call: 077140 50625.
+      doc.setFontSize(9.5);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(100, 116, 139); // Slate-500
+      doc.text("Sector 1, Saptgiri Colony, Shivanand Nagar, Raipur (C.G.) - 492008", 20, 31);
+      doc.text("Contact: 077140 50625 | Email: info@saubhagyahospital.com", 20, 36);
 
-Address: Sector 1, Saptgiri Colony, Shivanand Nagar, Raipur, Chhattisgarh 492008.
-Thank you for trusting Saubhagya Hospital!
-========================================
-    `;
+      // Decorative divider
+      doc.setDrawColor(226, 232, 240); // Slate-200
+      doc.setLineWidth(0.5);
+      doc.line(20, 42, 190, 42);
 
-    const blob = new Blob([fileContent], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `Saubhagya_Appointment_${appt.id}.txt`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+      // Title of receipt
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(13);
+      doc.setTextColor(13, 148, 136); // Teal-600
+      doc.text("APPOINTMENT BOOKING RECEIPT", 20, 52);
+
+      // Status badge box
+      const isScheduled = appt.status === 'Scheduled';
+      if (isScheduled) {
+        doc.setFillColor(240, 253, 250); // Light teal bg (#f0fdfa)
+        doc.setDrawColor(204, 251, 241); // Teal border (#ccfbf1)
+        doc.rect(138, 46, 52, 8, 'FD');
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(9);
+        doc.setTextColor(15, 118, 110); // Teal text (#0f766e)
+        doc.text("STATUS: ACTIVE / SCHEDULED", 140, 51.5);
+      } else {
+        doc.setFillColor(254, 242, 242); // Light red bg (#fef2f2)
+        doc.setDrawColor(254, 226, 226); // Red border (#fee2e2)
+        doc.rect(138, 46, 52, 8, 'FD');
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(9);
+        doc.setTextColor(185, 28, 28); // Red text (#b91c1c)
+        doc.text("STATUS: CANCELLED", 145, 51.5);
+      }
+
+      // Receipt Metadata Card block
+      doc.setFillColor(248, 250, 252); // Slate-50 background
+      doc.setDrawColor(241, 245, 249);
+      doc.rect(20, 58, 170, 18, 'FD');
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9.5);
+      doc.setTextColor(100, 116, 139);
+      doc.text("Receipt No:", 25, 64);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(30, 41, 59);
+      doc.text(appt.id, 55, 64);
+
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(100, 116, 139);
+      doc.text("Booked Date:", 25, 70);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(30, 41, 59);
+      doc.text(appt.bookedAt || "N/A", 55, 70);
+
+      // Patient Details Heading
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.setTextColor(13, 148, 136); // Teal-600
+      doc.text("PATIENT INFORMATION", 20, 90);
+
+      // Patient underline
+      doc.setDrawColor(204, 251, 241);
+      doc.line(20, 93, 190, 93);
+
+      // Patient Details
+      doc.setFontSize(9.5);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(100, 116, 139);
+      doc.text("Patient Name:", 25, 101);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(30, 41, 59);
+      doc.text(appt.patientName, 65, 101);
+
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(100, 116, 139);
+      doc.text("Age / Gender:", 25, 108);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(30, 41, 59);
+      doc.text(`${appt.patientAge} Years / ${appt.patientGender}`, 65, 108);
+
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(100, 116, 139);
+      doc.text("Contact Number:", 25, 115);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(30, 41, 59);
+      doc.text(appt.patientPhone, 65, 115);
+
+      // Visit / Consultation details
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.setTextColor(13, 148, 136); // Teal-600
+      doc.text("VISIT & CONSULTATION DETAILS", 20, 130);
+
+      // Consultation underline
+      doc.line(20, 133, 190, 133);
+
+      // Consultation details fields
+      doc.setFontSize(9.5);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(100, 116, 139);
+      doc.text("Department:", 25, 141);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(30, 41, 59);
+      doc.text(appt.departmentName, 65, 141);
+
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(100, 116, 139);
+      doc.text("Consultation Date:", 25, 148);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(30, 41, 59);
+      doc.text(appt.date, 65, 148);
+
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(100, 116, 139);
+      doc.text("Preferred Slot:", 25, 155);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(30, 41, 59);
+      doc.text(appt.timeSlot, 65, 155);
+
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(100, 116, 139);
+      doc.text("Key Symptoms/Notes:", 25, 162);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(30, 41, 59);
+      const symptomsTxt = appt.symptoms || "General checkup";
+      const splitSymptoms = doc.splitTextToSize(symptomsTxt, 115);
+      doc.text(splitSymptoms, 65, 162);
+
+      // Instructions block
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.setTextColor(13, 148, 136); // Teal-600
+      doc.text("IMPORTANT PATIENT INSTRUCTIONS", 20, 185);
+
+      // Instructions line
+      doc.line(20, 188, 190, 188);
+
+      doc.setFontSize(9);
+      doc.setTextColor(71, 85, 105); // Slate-600
+      doc.setFont('helvetica', 'normal');
+      doc.text("1. Please arrive at the Saubhagya Hospital reception 15 minutes before your time slot.", 25, 196);
+      doc.text("2. Bring all relevant previous medical history files, report sheets, or active prescriptions.", 25, 202);
+      doc.text("3. Search 'Saubhagya Hospital Sector 1 Shivanand Nagar' on Google Maps for simple directions.", 25, 208);
+      doc.text("4. For cancellation, schedule updates, or real-time assistance, call: 077140 50625.", 25, 214);
+
+      // Draw standard line footer separator
+      doc.setDrawColor(226, 232, 240);
+      doc.line(20, 242, 190, 242);
+
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(148, 163, 184); // Slate-400
+      doc.text("This receipt is generated automatically by Saubhagya Hospital Raipur Patient Portal.", 105, 250, { align: 'center' });
+      doc.text("Address: Sector 1, Saptgiri Colony, Shivanand Nagar, Raipur, Chhattisgarh 492008.", 105, 255, { align: 'center' });
+      doc.text("Thank you for choosing Saubhagya Hospital as your trusted healthcare partner.", 105, 260, { align: 'center' });
+
+      // Save PDF output file
+      doc.save(`Saubhagya_Appointment_${appt.id}.pdf`);
+    } catch (error) {
+      console.error("PDF generation failed:", error);
+      alert(language === 'en' ? "Failed to download PDF. Please try again." : "पीडीएफ डाउनलोड करने में विफल रहा। कृपया पुनः प्रयास करें।");
+    }
   };
 
   return (
